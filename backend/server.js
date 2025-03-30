@@ -13,11 +13,13 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ Serve static files properly on Render
-const publicPath = path.join(__dirname, "../public");
+// ✅ Use proper path resolution for Render
+const publicPath = path.join(__dirname, "public"); 
+console.log(`Serving static files from: ${publicPath}`);
+
 app.use(express.static(publicPath));
 
-// ✅ Serve index.html by default
+// ✅ Serve index.html for the root route
 app.get("/", (req, res) => {
     res.sendFile(path.join(publicPath, "index.html"));
 });
@@ -27,22 +29,29 @@ app.get("/library", (req, res) => {
     const libraryPath = path.join(publicPath, "library");
 
     if (!fs.existsSync(libraryPath)) {
+        console.log(`Library not found: ${libraryPath}`);
         return res.status(404).json({ message: "Library not found" });
     }
 
     const getFolderContent = (folderPath) => {
-        const items = fs.readdirSync(folderPath).map(item => {
-            const itemPath = path.join(folderPath, item);
-            const stats = fs.statSync(itemPath);
+        try {
+            const items = fs.readdirSync(folderPath).map(item => {
+                const itemPath = path.join(folderPath, item);
+                const stats = fs.statSync(itemPath);
 
-            return {
-                name: item,
-                path: `/media/library/${path.relative(libraryPath, itemPath).replace(/\\/g, "/")}`,
-                isFolder: stats.isDirectory()
-            };
-        });
+                return {
+                    name: item,
+                    path: `/media/library/${item}`,
+                    isFolder: stats.isDirectory()
+                };
+            });
 
-        return items;
+            return items;
+
+        } catch (error) {
+            console.error(`Failed to read folder: ${error.message}`);
+            return [];
+        }
     };
 
     const folders = getFolderContent(libraryPath);
@@ -67,6 +76,7 @@ app.get("/library/*", (req, res) => {
     const folderPath = path.join(publicPath, "library", req.params[0]);
 
     if (!fs.existsSync(folderPath)) {
+        console.log(`Folder not found: ${folderPath}`);
         return res.status(404).json({ message: "Folder not found" });
     }
 
@@ -76,7 +86,7 @@ app.get("/library/*", (req, res) => {
 
         return {
             name: item,
-            path: `/media/library/${req.params[0]}/${item}`.replace(/\\/g, "/"),
+            path: `/media/library/${req.params[0]}/${item}`,
             isFolder: stats.isDirectory(),
             type: stats.isDirectory() ? "folder" : mime.lookup(itemPath) || "application/octet-stream"
         };
@@ -94,6 +104,7 @@ app.get("/media/*", (req, res) => {
         res.setHeader("Content-Type", mimeType);
         fs.createReadStream(mediaPath).pipe(res);
     } else {
+        console.log(`Media not found: ${mediaPath}`);
         res.status(404).send("Media not found");
     }
 });
@@ -117,12 +128,10 @@ app.post("/login", (req, res) => {
     }
 });
 
-// ✅ Admin Panel Integration
-app.use('/admin', express.static(path.join(publicPath, 'admin')));
-
 // ✅ Google Drive video links
 app.get('/drive-videos', (req, res) => {
     const driveVideosPath = path.join(__dirname, "google-drive-videos.json");
+    
     const videos = fs.existsSync(driveVideosPath)
         ? JSON.parse(fs.readFileSync(driveVideosPath, "utf8"))
         : [];
@@ -166,8 +175,6 @@ app.use('/upload', require('./upload'));
 app.use('/delete', require('./delete'));
 
 // ✅ Route to add Google Drive videos
-const driveVideosPath = path.join(__dirname, "google-drive-videos.json");
-
 app.post('/add-drive-video', (req, res) => {
     const { name, url } = req.body;
 
@@ -175,6 +182,8 @@ app.post('/add-drive-video', (req, res) => {
         return res.status(400).json({ message: "Name and URL are required" });
     }
 
+    const driveVideosPath = path.join(__dirname, "google-drive-videos.json");
+    
     const videos = fs.existsSync(driveVideosPath)
         ? JSON.parse(fs.readFileSync(driveVideosPath, "utf8"))
         : [];
@@ -184,41 +193,6 @@ app.post('/add-drive-video', (req, res) => {
     fs.writeFileSync(driveVideosPath, JSON.stringify(videos, null, 2));
 
     res.status(201).json({ message: "Video added successfully", video: { name, url } });
-});
-
-// ✅ Email-sending functionality
-app.post('/send-email', async (req, res) => {
-    const { name, email, message } = req.body;
-
-    if (!name || !email || !message) {
-        return res.status(400).json({ message: "All fields are required" });
-    }
-
-    try {
-        const transporter = nodemailer.createTransport({
-            host: process.env.GMAIL_HOST,
-            port: process.env.GMAIL_PORT,
-            secure: false,
-            auth: {
-                user: process.env.GMAIL_USER,
-                pass: process.env.GMAIL_PASS
-            }
-        });
-
-        const mailOptions = {
-            from: process.env.GMAIL_USER,
-            to: "forclassyfamily@gmail.com",
-            subject: `New Contact Form Submission from ${name}`,
-            text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`
-        };
-
-        await transporter.sendMail(mailOptions);
-        res.status(200).json({ message: "Email sent successfully" });
-
-    } catch (error) {
-        console.error("Email sending failed:", error);
-        res.status(500).json({ message: "Failed to send email" });
-    }
 });
 
 // ✅ Start the server

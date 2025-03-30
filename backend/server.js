@@ -3,7 +3,7 @@ const fs = require("fs");
 const cors = require("cors");
 const path = require("path");
 const mime = require("mime-types");
-const nodemailer = require("nodemailer");  
+const nodemailer = require("nodemailer");
 require("dotenv").config();
 
 const app = express();
@@ -13,17 +13,18 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ Serve static files correctly
-app.use(express.static(path.join(__dirname, "../public")));
+// ✅ Serve static files properly on Render
+const publicPath = path.join(__dirname, "../public");
+app.use(express.static(publicPath));
 
-// ✅ Serve index.html for the root route
+// ✅ Serve index.html by default
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "../public/index.html"));
+    res.sendFile(path.join(publicPath, "index.html"));
 });
 
 // ✅ Serve the main library folders
 app.get("/library", (req, res) => {
-    const libraryPath = path.resolve(__dirname, "../public/library");
+    const libraryPath = path.join(publicPath, "library");
 
     if (!fs.existsSync(libraryPath)) {
         return res.status(404).json({ message: "Library not found" });
@@ -36,7 +37,7 @@ app.get("/library", (req, res) => {
 
             return {
                 name: item,
-                path: `/library/${path.relative(libraryPath, itemPath).replace(/\\/g, "/")}`,
+                path: `/media/library/${path.relative(libraryPath, itemPath).replace(/\\/g, "/")}`,
                 isFolder: stats.isDirectory()
             };
         });
@@ -46,7 +47,7 @@ app.get("/library", (req, res) => {
 
     const folders = getFolderContent(libraryPath);
 
-    const driveVideosPath = path.resolve(__dirname, "google-drive-videos.json");
+    const driveVideosPath = path.join(__dirname, "google-drive-videos.json");
     const driveVideos = fs.existsSync(driveVideosPath)
         ? JSON.parse(fs.readFileSync(driveVideosPath, "utf8"))
         : [];
@@ -63,7 +64,7 @@ app.get("/library", (req, res) => {
 
 // ✅ Serve content inside nested folders
 app.get("/library/*", (req, res) => {
-    const folderPath = path.resolve(__dirname, "../public/library", req.params[0]);
+    const folderPath = path.join(publicPath, "library", req.params[0]);
 
     if (!fs.existsSync(folderPath)) {
         return res.status(404).json({ message: "Folder not found" });
@@ -86,7 +87,7 @@ app.get("/library/*", (req, res) => {
 
 // ✅ Serve media files (images and videos)
 app.get("/media/*", (req, res) => {
-    const mediaPath = path.resolve(__dirname, "../public", req.params[0]);
+    const mediaPath = path.join(publicPath, req.params[0]);
 
     if (fs.existsSync(mediaPath)) {
         const mimeType = mime.lookup(mediaPath) || "application/octet-stream";
@@ -117,7 +118,7 @@ app.post("/login", (req, res) => {
 });
 
 // ✅ Admin Panel Integration
-app.use('/admin', express.static(path.join(__dirname, '../public/admin')));
+app.use('/admin', express.static(path.join(publicPath, 'admin')));
 
 // ✅ Google Drive video links
 app.get('/drive-videos', (req, res) => {
@@ -150,7 +151,7 @@ const listFiles = async (dir) => {
 // ✅ List files for admin panel
 app.get('/files', async (req, res) => {
     try {
-        const files = await listFiles(path.resolve(__dirname, "../public/library"));
+        const files = await listFiles(path.join(publicPath, "library"));
         res.json(files);
     } catch (error) {
         console.error("Error listing files:", error);

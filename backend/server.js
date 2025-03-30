@@ -13,24 +13,25 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ Correct the path for Render deployment
-const publicPath = path.join(__dirname, "../public");  
+// ✅ Use __dirname correctly for Render
+const publicPath = path.resolve(__dirname, "../public");  
 console.log(`Serving static files from: ${publicPath}`);
 
-// ✅ Serve static files
+// ✅ Serve static files from the public folder
 app.use(express.static(publicPath));
 
-// ✅ Serve index.html for the root route
+// ✅ Serve the index.html on the root route
 app.get("/", (req, res) => {
     const indexPath = path.join(publicPath, "index.html");
     if (fs.existsSync(indexPath)) {
         res.sendFile(indexPath);
     } else {
+        console.error("Index file not found");
         res.status(404).send("Index not found");
     }
 });
 
-// ✅ Serve the main library folders
+// ✅ Serve the library folders
 app.get("/library", (req, res) => {
     const libraryPath = path.join(publicPath, "library");
 

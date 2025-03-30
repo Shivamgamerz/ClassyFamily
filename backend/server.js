@@ -9,42 +9,24 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// ✅ Render uses `/opt/render/project/src` as the root directory
+const basePath = path.resolve(__dirname, "../public");
+console.log(`✅ Serving static files from: ${basePath}`);
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ Use __dirname correctly for Render
-const publicPath = path.resolve(__dirname, "../public");  
-console.log(`✅ Serving static files from: ${publicPath}`);
+// ✅ Serve static files properly
+app.use("/media", express.static(path.join(basePath, "library")));
+app.use(express.static(basePath));
 
-// ✅ Log project structure
-const logProjectStructure = (dir, level = 0) => {
-    const items = fs.readdirSync(dir);
-
-    for (const item of items) {
-        const itemPath = path.join(dir, item);
-        const isFolder = fs.statSync(itemPath).isDirectory();
-
-        console.log(`${"  ".repeat(level)}📁 ${item} (${isFolder ? "Folder" : "File"})`);
-
-        if (isFolder) {
-            logProjectStructure(itemPath, level + 1);
-        }
-    }
-};
-
-// ✅ Log the structure at startup
-console.log("\n🔍 Project Structure:");
-logProjectStructure(publicPath);
-
-app.use(express.static(publicPath));
-
-// ✅ Serve the index.html on the root route
+// ✅ Serve index.html correctly
 app.get("/", (req, res) => {
-    const indexPath = path.join(publicPath, "index.html");
-    console.log(`📄 Serving index.html: ${indexPath}`);
-    
+    const indexPath = path.join(basePath, "index.html");
+
     if (fs.existsSync(indexPath)) {
+        console.log(`📄 Serving index.html: ${indexPath}`);
         res.sendFile(indexPath);
     } else {
         console.error("❌ Index file not found");
@@ -54,7 +36,7 @@ app.get("/", (req, res) => {
 
 // ✅ Serve the library folders
 app.get("/library", (req, res) => {
-    const libraryPath = path.join(publicPath, "library");
+    const libraryPath = path.join(basePath, "library");
     console.log(`📁 Serving library from: ${libraryPath}`);
 
     if (!fs.existsSync(libraryPath)) {
@@ -68,11 +50,9 @@ app.get("/library", (req, res) => {
                 const itemPath = path.join(folderPath, item);
                 const stats = fs.statSync(itemPath);
 
-                console.log(`📦 ${item} (${stats.isDirectory() ? "Folder" : "File"})`);
-
                 return {
                     name: item,
-                    path: `/media/library/${item}`,
+                    path: `/media/${path.relative(basePath, itemPath).replace(/\\/g, "/")}`,
                     isFolder: stats.isDirectory()
                 };
             });
@@ -88,6 +68,8 @@ app.get("/library", (req, res) => {
     const folders = getFolderContent(libraryPath);
 
     const driveVideosPath = path.join(__dirname, "google-drive-videos.json");
+    console.log(`🎥 Fetching Google Drive videos from: ${driveVideosPath}`);
+
     const driveVideos = fs.existsSync(driveVideosPath)
         ? JSON.parse(fs.readFileSync(driveVideosPath, "utf8"))
         : [];
@@ -99,12 +81,13 @@ app.get("/library", (req, res) => {
         type: "google-drive"
     }))];
 
+    console.log(`✅ Folders + Drive Videos: ${JSON.stringify(combinedContent, null, 2)}`);
     res.json(combinedContent);
 });
 
-// ✅ Serve content inside nested folders
+// ✅ Serve nested folder content
 app.get("/library/*", (req, res) => {
-    const folderPath = path.join(publicPath, "library", req.params[0]);
+    const folderPath = path.join(basePath, "library", req.params[0]);
     console.log(`📂 Serving nested folder: ${folderPath}`);
 
     if (!fs.existsSync(folderPath)) {
@@ -116,11 +99,9 @@ app.get("/library/*", (req, res) => {
         const itemPath = path.join(folderPath, item);
         const stats = fs.statSync(itemPath);
 
-        console.log(`📦 ${item} (${stats.isDirectory() ? "Folder" : "File"})`);
-
         return {
             name: item,
-            path: `/media/library/${req.params[0]}/${item}`,
+            path: `/media/${path.relative(basePath, itemPath).replace(/\\/g, "/")}`,
             isFolder: stats.isDirectory(),
             type: stats.isDirectory() ? "folder" : mime.lookup(itemPath) || "application/octet-stream"
         };
@@ -129,9 +110,9 @@ app.get("/library/*", (req, res) => {
     res.json(items);
 });
 
-// ✅ Serve media files (images and videos)
+// ✅ Serve media files
 app.get("/media/*", (req, res) => {
-    const mediaPath = path.join(publicPath, req.params[0]);
+    const mediaPath = path.join(basePath, req.params[0]);
     console.log(`🖼️ Serving media: ${mediaPath}`);
 
     if (fs.existsSync(mediaPath)) {
@@ -142,6 +123,19 @@ app.get("/media/*", (req, res) => {
         console.log(`❌ Media not found: ${mediaPath}`);
         res.status(404).send("Media not found");
     }
+});
+
+// ✅ Google Drive video links
+app.get('/drive-videos', (req, res) => {
+    const driveVideosPath = path.join(__dirname, "google-drive-videos.json");
+    console.log(`🎥 Serving Google Drive videos`);
+
+    const videos = fs.existsSync(driveVideosPath)
+        ? JSON.parse(fs.readFileSync(driveVideosPath, "utf8"))
+        : [];
+
+    console.log(`✅ Google Drive videos: ${JSON.stringify(videos, null, 2)}`);
+    res.json(videos);
 });
 
 // ✅ Login route
@@ -165,18 +159,6 @@ app.post("/login", (req, res) => {
         console.log(`❌ Invalid credentials for: ${username}`);
         res.status(401).json({ message: "Invalid credentials" });
     }
-});
-
-// ✅ Google Drive video links
-app.get('/drive-videos', (req, res) => {
-    const driveVideosPath = path.join(__dirname, "google-drive-videos.json");
-    console.log(`🎥 Serving Google Drive videos`);
-
-    const videos = fs.existsSync(driveVideosPath)
-        ? JSON.parse(fs.readFileSync(driveVideosPath, "utf8"))
-        : [];
-
-    res.json(videos);
 });
 
 // ✅ Start the server

@@ -3,7 +3,7 @@ const fs = require("fs");
 const cors = require("cors");
 const path = require("path");
 const mime = require("mime-types");
-const nodemailer = require("nodemailer");  // ✅ Added Nodemailer
+const nodemailer = require("nodemailer");  
 require("dotenv").config();
 
 const app = express();
@@ -12,7 +12,14 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static("../public"));
+
+// ✅ Serve static files correctly
+app.use(express.static(path.join(__dirname, "../public")));
+
+// ✅ Serve index.html for the root route
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "../public/index.html"));
+});
 
 // ✅ Serve the main library folders
 app.get("/library", (req, res) => {
@@ -188,15 +195,14 @@ app.post('/send-email', async (req, res) => {
 
     try {
         const transporter = nodemailer.createTransport({
-            host: process.env.GMAIL_HOST,   // ✅ Uses Gmail SMTP
-            port: process.env.GMAIL_PORT,   // ✅ Port 587
-            secure: false,                  // ✅ Add this line (for TLS over port 587)
+            host: process.env.GMAIL_HOST,
+            port: process.env.GMAIL_PORT,
+            secure: false,
             auth: {
                 user: process.env.GMAIL_USER,
                 pass: process.env.GMAIL_PASS
             }
         });
-        
 
         const mailOptions = {
             from: process.env.GMAIL_USER,
@@ -214,4 +220,5 @@ app.post('/send-email', async (req, res) => {
     }
 });
 
+// ✅ Start the server
 app.listen(PORT, () => console.log(`🔥 Server running at http://localhost:${PORT}`));

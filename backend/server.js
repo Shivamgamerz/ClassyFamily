@@ -13,15 +13,21 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ Use proper path resolution for Render
-const publicPath = path.join(__dirname, "public"); 
+// ✅ Correct the path for Render deployment
+const publicPath = path.join(__dirname, "../public");  
 console.log(`Serving static files from: ${publicPath}`);
 
+// ✅ Serve static files
 app.use(express.static(publicPath));
 
 // ✅ Serve index.html for the root route
 app.get("/", (req, res) => {
-    res.sendFile(path.join(publicPath, "index.html"));
+    const indexPath = path.join(publicPath, "index.html");
+    if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+    } else {
+        res.status(404).send("Index not found");
+    }
 });
 
 // ✅ Serve the main library folders
@@ -137,62 +143,6 @@ app.get('/drive-videos', (req, res) => {
         : [];
 
     res.json(videos);
-});
-
-// ✅ List all files recursively
-const listFiles = async (dir) => {
-    let files = [];
-    const items = await fs.promises.readdir(dir, { withFileTypes: true });
-
-    for (const item of items) {
-        const fullPath = path.join(dir, item.name);
-
-        if (item.isDirectory()) {
-            const subFiles = await listFiles(fullPath);
-            files = files.concat(subFiles);
-        } else {
-            files.push(fullPath.replace(/\\/g, '/'));
-        }
-    }
-    return files;
-};
-
-// ✅ List files for admin panel
-app.get('/files', async (req, res) => {
-    try {
-        const files = await listFiles(path.join(publicPath, "library"));
-        res.json(files);
-    } catch (error) {
-        console.error("Error listing files:", error);
-        res.status(500).json({ message: "Failed to list files" });
-    }
-});
-
-// ✅ Handle uploads
-app.use('/upload', require('./upload'));
-
-// ✅ Handle deletes
-app.use('/delete', require('./delete'));
-
-// ✅ Route to add Google Drive videos
-app.post('/add-drive-video', (req, res) => {
-    const { name, url } = req.body;
-
-    if (!name || !url) {
-        return res.status(400).json({ message: "Name and URL are required" });
-    }
-
-    const driveVideosPath = path.join(__dirname, "google-drive-videos.json");
-    
-    const videos = fs.existsSync(driveVideosPath)
-        ? JSON.parse(fs.readFileSync(driveVideosPath, "utf8"))
-        : [];
-
-    videos.push({ name, path: url });
-
-    fs.writeFileSync(driveVideosPath, JSON.stringify(videos, null, 2));
-
-    res.status(201).json({ message: "Video added successfully", video: { name, url } });
 });
 
 // ✅ Start the server

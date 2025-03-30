@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Add Drive Videos</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <script>
+        if (!localStorage.getItem("username")) {
+            window.location.href = "../index.html";
+        }
+    </script>
+
+<header>
+    <h1>Admin Panel - Add Drive Videos</h1>
+    <nav>
+        <ul>
+            <li><a href="../index2.html">Home</a></li>
+            <li><a href="../library.html">Library</a></li>
+            <li><a href="../library2.html">Videos</a></li>
+            <li><a href="../login.html" id="logoutBtn">Logout</a></li>
+        </ul>
+    </nav>
+</header>
+
+<div class="container">
+    <div class="upload-section">
+        <h2>Add Google Drive Video</h2>
+
+        <!-- ✅ Form for Adding Drive Videos -->
+        <form id="drive-video-form">
+            <label for="name">Video Name:</label>
+            <input type="text" id="name" name="name" placeholder="Enter video name" required>
+
+            <label for="url">Google Drive URL:</label>
+            <input type="url" id="url" name="url" placeholder="Enter Drive embed URL" required>
+
+            <button type="submit">Add Video</button>
+        </form>
+
+        <div id="status"></div>
+    </div>
+
+    <div class="video-list">
+        <h2>Existing Videos</h2>
+        <ul id="video-list"></ul>
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2025 ClassyFamily. All Rights Reserved.</p>
+</footer>
+
+<script src="./admin-drive.js"></script>
+
+</body>
+</html>

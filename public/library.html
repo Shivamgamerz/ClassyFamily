@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClassyFamily - Library</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Roboto:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Navbar and spacing */
+        header {
+            padding-bottom: 20px;
+        }
+
+        .library-container {
+            max-width: 1200px;
+            margin: 100px auto;
+            padding: 30px;
+            background: #1e1e1e;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .folder,
+        .file {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            background: #2c2c2c;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            transition: transform 0.3s, background 0.3s;
+            cursor: pointer;
+        }
+
+        .folder:hover,
+        .file:hover {
+            transform: translateY(-5px);
+            background: #383838;
+        }
+
+        .folder i,
+        .file i {
+            font-size: 2rem;
+            color: #FF9800;
+        }
+
+        .folder-name,
+        .file-name {
+            font-size: 1.5rem;
+            color: #e0e0e0;
+        }
+
+        /* Stylish open/close buttons */
+        .folder-btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #FF5722, #FF9800);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .folder-btn:hover {
+            background: linear-gradient(135deg, #FF9800, #FF5722);
+            transform: scale(1.05);
+        }
+
+        .media-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.7s ease, opacity 0.5s ease;
+            margin-bottom: 30px;
+        }
+
+        .media-container.open {
+            max-height: 1500px;
+            opacity: 1;
+        }
+
+        .media {
+            width: 300px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .media:hover {
+            transform: scale(1.05);
+        }
+
+        /* Fullscreen viewer */
+        .fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .fullscreen img,
+        .fullscreen video,
+        .fullscreen iframe {
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 40px;
+            color: #FF9800;
+            cursor: pointer;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+
+            .folder,
+            .file {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .media {
+                width: 100%;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <script>
+        // ✅ Redirect if not logged in
+        if (!localStorage.getItem("username")) {
+            window.location.href = "index.html";
+        }
+    </script>
+
+
+
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>ClassyFamily</h1>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index2.html">Home</a></li>
+                </ul>
+                <span id="usernameDisplay" style="color: #FF9800; font-weight: bold;"></span>
+                <button id="logoutBtn"
+                    style="background: #FF5722; color: white; border: none; padding: 10px 20px; cursor: pointer;">Logout</button>
+            </nav>
+        </div>
+    </header>
+
+
+    <section class="library-container">
+        <h2 style="text-align: center; color: #FF9800;">Library</h2>
+
+        <!-- Library 2 Link -->
+        <div style="text-align: center; margin: 40px 0;">
+            <a href="library2.html"
+                style="text-decoration: none; color: #FF9800; font-size: 1.2rem; font-weight: bold;">
+                ➡️ Go to Library 2
+            </a>
+        </div>
+
+        <div id="library-content"></div>
+    </section>
+
+
+
+
+    <footer>
+        <p>&copy; 2025 ClassyFamily. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        const logoutBtn = document.getElementById('logoutBtn');
+        const usernameDisplay = document.getElementById('usernameDisplay');
+        const libraryContent = document.getElementById('library-content');
+
+        const username = localStorage.getItem('username');
+
+        if (username) {
+            usernameDisplay.textContent = `👤 ${username}`;
+        } else {
+            window.location.href = "index.html";
+        }
+
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('username');
+            window.location.href = 'index.html';
+        });
+
+        // ✅ Function to load the library content
+        // ✅ Function to load the library content (excluding Google Drive videos)
+        async function loadLibrary() {
+            libraryContent.innerHTML = '';
+
+            try {
+                const response = await fetch('http://localhost:3000/library');
+                const folders = await response.json();
+
+                folders.forEach(item => {
+                    // ✅ Skip Google Drive videos
+                    if (item.type === 'google-drive') {
+                        return;
+                    }
+
+                    const div = document.createElement('div');
+                    div.classList.add(item.isFolder ? 'folder' : 'file');
+
+                    // ✅ Display folders with "Open" buttons
+                    div.innerHTML = `
+                <div class="folder-info">
+                    <i class="${item.isFolder ? 'fas fa-folder' : 'fas fa-file'}"></i>
+                    <span class="folder-name">${item.name}</span>
+                </div>
+                ${item.isFolder
+                            ? `<button class="folder-btn" onclick="toggleFolder('${item.path}', this)">Open</button>`
+                            : ''}
+            `;
+
+                    const contentDiv = document.createElement('div');
+                    contentDiv.classList.add('media-container');
+                    contentDiv.id = `folder-${item.path.replace(/\//g, '-')}`;
+
+                    libraryContent.appendChild(div);
+                    libraryContent.appendChild(contentDiv);
+                });
+
+            } catch (error) {
+                console.error('Failed to load library:', error);
+            }
+        }
+
+
+        // ✅ Function to toggle folder content correctly
+        async function toggleFolder(folderPath, btn) {
+            const contentDiv = document.getElementById(`folder-${folderPath.replace(/\//g, '-')}`);
+
+            if (contentDiv.classList.contains('open')) {
+                contentDiv.classList.remove('open');
+                contentDiv.innerHTML = '';
+                btn.textContent = 'Open';
+            } else {
+                try {
+                    const response = await fetch(`http://localhost:3000${folderPath}`);
+                    const content = await response.json();
+
+                    contentDiv.innerHTML = '';
+
+                    content.forEach(item => {
+                        if (item.isFolder) {
+                            // ✅ Display nested folders
+                            const folderDiv = document.createElement('div');
+                            folderDiv.classList.add('folder');
+
+                            folderDiv.innerHTML = `
+                        <i class="fas fa-folder"></i>
+                        <span>${item.name}</span>
+                        <button class="folder-btn" onclick="toggleFolder('${item.path}', this)">Open</button>
+                    `;
+
+                            contentDiv.appendChild(folderDiv);
+                        } else {
+                            // ✅ Display media (images and videos)
+                            if (item.type.startsWith('image')) {
+                                const img = document.createElement('img');
+                                img.src = item.path;
+                                img.classList.add('media');
+                                img.onclick = () => openFullscreen(img);
+                                contentDiv.appendChild(img);
+
+                            } else if (item.type.startsWith('video')) {
+                                const video = document.createElement('video');
+                                video.src = item.path;
+                                video.controls = true;
+                                video.classList.add('media');
+                                contentDiv.appendChild(video);
+
+                            } else {
+                                // ✅ Display non-media files
+                                const fileDiv = document.createElement('div');
+                                fileDiv.classList.add('file');
+                                fileDiv.textContent = item.name;
+                                contentDiv.appendChild(fileDiv);
+                            }
+                        }
+                    });
+
+                    contentDiv.classList.add('open');
+                    btn.textContent = 'Close';
+
+                } catch (error) {
+                    console.error('Failed to load folder content:', error);
+                }
+            }
+        }
+
+
+        // ✅ Fullscreen viewer for images and videos
+        function openFullscreen(media) {
+            const fullscreen = document.createElement('div');
+            fullscreen.classList.add('fullscreen');
+
+            if (media.tagName === 'IMG') {
+                fullscreen.innerHTML = `
+                <img src="${media.src}" alt="Fullscreen Image">
+                <span class="close-btn" onclick="this.parentElement.remove()">&times;</span>
+            `;
+            } else if (media.tagName === 'VIDEO') {
+                fullscreen.innerHTML = `
+                <video src="${media.src}" controls autoplay></video>
+                <span class="close-btn" onclick="this.parentElement.remove()">&times;</span>
+            `;
+            }
+
+            document.body.appendChild(fullscreen);
+        }
+
+        // ✅ Load the library content on page load
+        window.onload = loadLibrary;
+    </script>
+
+
+</body>
+
+</html>

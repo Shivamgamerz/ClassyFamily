@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClassyFamily - Celebrating Together</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Roboto:wght@300;400;500&family=Open+Sans:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* General Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background: #121212;
+            color: #fff;
+            padding: 40px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links li a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        .nav-links li a:hover {
+            color: #FF9800;
+        }
+
+        /* Hamburger for Mobile */
+        .hamburger {
+            display: none;
+            font-size: 26px;
+            cursor: pointer;
+            color: #FF9800;
+        }
+
+        /* Auth Buttons */
+        .auth-btns {
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Hero Section */
+        .hero {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;               /* Full viewport height */
+    padding: 0 8vw;                   /* More padding to prevent edges clipping */
+    box-sizing: border-box;
+    overflow: hidden;                  /* Prevent overflow issues */
+    text-align: center;
+}
+
+.hero-content h2 {
+    font-size: min(8vw, 4rem);        /* Dynamic, capped font size */
+    font-weight: 700;
+    color: #FF9800;
+    max-width: 100%;
+    white-space: nowrap;               /* Keep text on one line */
+    overflow: hidden;                  /* No overflow issues */
+    text-overflow: ellipsis;           /* Ellipsis for extra safety */
+    letter-spacing: 1.5px;             /* Improve readability */
+    padding: 0 2vw;                    /* Add side padding to prevent clipping */
+    transform: scale(1);               /* Keep normal size on large screens */
+}
+
+/* Fix for small screens */
+@media (max-width: 768px) {
+    .hero {
+        padding: 0 5vw;                /* Reduce padding for small screens */
+    }
+
+    .hero-content h2 {
+        font-size: 6vw;                /* Smaller font size on small screens */
+        padding: 0 3vw;                 /* Extra padding to prevent edges clipping */
+    }
+}
+
+
+
+        .hero-content p {
+            font-size: 1.5rem;
+            margin: 20px 0;
+        }
+
+        .cta-btn {
+            padding: 15px 35px;
+            font-size: 1.2rem;
+            background: #FF5722;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .cta-btn:hover {
+            transform: scale(1.1);
+            background: #FF9800;
+        }
+
+        /* Video Gallery */
+        .video-gallery {
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .video-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .video-item {
+            width: 350px;
+            height: 220px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s;
+        }
+
+        .video-item:hover {
+            transform: scale(1.05);
+        }
+
+        /* Footer */
+        footer {
+            background: #121212;
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .hamburger {
+                margin-right: 15px;
+                /* Add spacing */
+            }
+
+            .auth-btns,
+            .login-btn {
+                margin-left: 15px;
+                /* Add spacing */
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            .video-container {
+                flex-direction: column;
+            }
+
+            .video-item {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .hero-content h2 {
+                font-size: 3rem;
+            }
+
+            .hero-content p {
+                font-size: 1.2rem;
+            }
+
+            .cta-btn {
+                padding: 12px 30px;
+                font-size: 1.1rem;
+            }
+
+            .family-img {
+                max-width: 300px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .hero {
+                min-height: 90vh;
+                /* Ensure enough space */
+                padding: 150px 15px;
+                /* Added gap from navbar */
+            }
+
+            .hero-content h2 {
+                font-size: 2.5rem;
+            }
+
+            .hero-content p {
+                font-size: 1rem;
+            }
+
+            .cta-btn {
+                padding: 10px 25px;
+                font-size: 1rem;
+            }
+
+            .family-img {
+                max-width: 250px;
+            }
+
+            nav ul {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero {
+                min-height: 85vh;
+                padding: 180px 15px;
+                /* Increased gap further for small devices */
+            }
+
+            .hero-content h2 {
+                font-size: 2rem;
+            }
+
+            .hero-content p {
+                font-size: 0.9rem;
+            }
+
+            .cta-btn {
+                padding: 8px 20px;
+                font-size: 0.9rem;
+            }
+
+            .family-img {
+                max-width: 200px;
+            }
+
+            header {
+                padding: 15px 0;
+            }
+
+            .container {
+                gap: 10px;
+            }
+
+            nav ul {
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        if (!localStorage.getItem("username")) {
+            window.location.href = "index.html";  // Redirect if not logged in
+        }
+    </script>
+
+
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>ClassyFamily</h1>
+            </div>
+
+            <!-- Responsive Nav Menu -->
+            <nav>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#events">Events</a></li>
+                    <li><a href="#gallery">Gallery</a></li>
+                    <li><a href="#testimonials">Testimonials</a></li>
+                    <li><a href="#blog">Blog</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+
+                <!-- Hamburger Icon for Mobile -->
+                <div class="hamburger" onclick="toggleMenu()">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <button class="login-btn" id="loginBtn">
+                    <a href="login.html" style="text-decoration: none; color: white;">Login</a>
+                </button>
+
+                <span id="usernameDisplay" style="display: none; color: #FF9800; font-weight: bold;"></span>
+                <button id="logoutBtn"
+                    style="display:none; background-color: #FF5722; color: white; border: none; padding: 10px 20px; cursor: pointer;">Logout</button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+
+        <div class="hero-content">
+            <h2 class="animated-text"></h2> <!-- Animated Text -->
+            <!-- Add this inside the Hero Section -->
+            <img src="family.png" alt="Family" class="family-img">
+
+            <p class="sub-greeting">Bringing families together, one memory at a time.</p>
+            <p>Where every family celebration is shared with love and joy.</p>
+            <a href="library.html"><button class="cta-btn">Explore Our Library</button></a>
+
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2>About Us</h2>
+            <p>ClassyFamily brings together your precious memories in a beautiful, shared platform.</p>
+        </div>
+    </section>
+
+    <!-- Video Gallery Section -->
+    <section id="events" class="video-gallery">
+        <h2>Our Family Events</h2>
+        <div class="video-container">
+            <div class="video-item" onclick="openPopup('video1.mp4')">
+                <img src="uploads/wedding-thubnail.jpeg" alt="Wedding Thumbnail">
+                <div class="overlay"><span>Watch Wedding</span></div>
+            </div>
+            <div class="video-item" onclick="openPopup('video2.mp4')">
+                <img src="uploads/event-thubnail.jpg" alt="Event Thumbnail">
+                <div class="overlay"><span>Watch Event</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery" class="gallery">
+        <h2>Gallery</h2>
+        <div class="gallery-container">
+            <img src="uploads/family-photo-1.jpg" alt="Family Photo">
+            <img src="uploads/family-trip.jpg" alt="Family Trip">
+            <img src="uploads/family-party.jpg" alt="Family Party">
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonials">
+        <h2>Testimonials</h2>
+        <div class="testimonial">
+            <p>"ClassyFamily made our wedding memories unforgettable! Highly recommend it."</p>
+            <span>- Manish Giri</span>
+        </div>
+        <div class="testimonial">
+            <p>"A perfect platform to share our family events with loved ones."</p>
+            <span>- Muskan Goswami</span>
+        </div>
+    </section>
+
+    <!-- Blog Section -->
+    <section id="blog" class="blog">
+        <h2>Our Blog</h2>
+        <div class="blog-post">
+            <h3>Family Bonding Tips</h3>
+            <p>Learn how to strengthen family bonds with fun activities and meaningful conversations.</p>
+        </div>
+        <div class="blog-post">
+            <h3>Event Planning Made Easy</h3>
+            <p>Discover tips and tricks for organizing memorable family events without the stress.</p>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2>Contact Us</h2>
+            <form id="contactForm" action="/send-email" method="POST">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" placeholder="Your Name" required>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" placeholder="Your Email" required>
+
+                <label for="message">Message:</label>
+                <textarea id="message" name="message" placeholder="Your Message" required></textarea>
+
+                <button type="submit">Send</button>
+                <div id="formMsg"></div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 ClassyFamily. All Rights Reserved.</p>
+    </footer>a
+
+    <!-- Video Popup
+    <div id="videoPopup" class="popup">
+        <span onclick="closePopup()" class="close-btn">&times;</span>
+        <video id="popupVideo" controls></video>
+    </div> -->
+
+    <script src="js/scripts.js"></script>
+    <script>
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+    </script>
+
+</body>
+
+</html>

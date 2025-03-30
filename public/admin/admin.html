@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - ClassyFamily</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ✅ Styling Fix for Dropdown */
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: #fff;
+            font-size: 14px;
+        }
+
+        option {
+            padding: 10px;
+        }
+
+        .loading {
+            color: #aaa;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        if (!localStorage.getItem("username")) {
+            window.location.href = "../index.html";
+        }
+    </script>
+
+<header>
+    <h1>Admin Panel - ClassyFamily</h1>
+    <nav>
+        <ul>
+            <li><a href="../index2.html">Home</a></li>
+            <li><a href="../library.html">Library</a></li>
+            <li><a href="../library2.html">Videos</a></li>
+            <li><a href="../login.html" id="logoutBtn">Logout</a></li>
+            <li><a href="./admin-drive.html">Manage Drive Videos</a></li>
+        </ul>
+    </nav>
+</header>
+
+<div class="container">
+    <div class="upload-section">
+        <h2>Upload Media</h2>
+
+        <!-- ✅ Upload Form -->
+        <form id="upload-form" enctype="multipart/form-data">
+            <label for="file">Select File:</label>
+            <input type="file" id="file" name="file" required>
+
+            <label for="folder">Choose Folder:</label>
+            <select id="folder" name="folder" required>
+                <option value="" class="loading">Loading folders...</option>
+            </select>
+
+            <button type="submit">Upload</button>
+        </form>
+
+        <div id="upload-status"></div>
+    </div>
+
+
+
+<footer>
+    <p>&copy; 2025 ClassyFamily. All Rights Reserved.</p>
+</footer>
+
+<script src="./admin.js"></script>
+
+</body>
+</html>

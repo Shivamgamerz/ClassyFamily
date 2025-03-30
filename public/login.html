@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ClassyFamily</title>
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+
+<div class="login-container">
+    <h2>Login</h2>
+    <form id="loginForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" required>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" required>
+
+        <button type="submit">Login</button>
+    </form>
+</div>
+
+<script src="js/login.js"></script>
+<script>
+    async function loadLibrary() {
+        const libraryContent = document.getElementById('library-content');
+        libraryContent.innerHTML = '';
+
+        try {
+            const response = await fetch('http://localhost:3000/library');
+
+            if (!response.ok) {
+                console.error('Failed to load library:', response.statusText);
+                return;
+            }
+
+            const folders = await response.json();
+
+            folders.forEach(item => {
+                const folderDiv = document.createElement('div');
+                folderDiv.classList.add('folder');
+
+                const folderId = `folder-${item.path.replace(/[\/\\]/g, '-')}`;
+
+                folderDiv.innerHTML = `
+                    <div class="folder-info">
+                        <i class="fas fa-folder"></i>
+                        <span class="folder-name">${item.name}</span>
+                    </div>
+                    <button class="folder-btn" onclick="toggleFolder('${item.path}', this, '${folderId}')">
+                        Open
+                    </button>
+                `;
+
+                const photosDiv = document.createElement('div');
+                photosDiv.classList.add('photos');
+                photosDiv.id = folderId;
+
+                libraryContent.appendChild(folderDiv);
+                libraryContent.appendChild(photosDiv);
+            });
+
+        } catch (error) {
+            console.error('Failed to load library:', error);
+        }
+    }
+
+    // ✅ Toggle folders and load images
+    async function toggleFolder(folderPath, btn, folderId) {
+        const photosDiv = document.getElementById(folderId);
+
+        if (photosDiv.classList.contains('open')) {
+            photosDiv.classList.remove('open');
+            btn.textContent = 'Open';
+        } else {
+            try {
+                const response = await fetch(`http://localhost:3000/library${folderPath}`);
+                const content = await response.json();
+
+                photosDiv.innerHTML = '';
+
+                content.forEach(item => {
+                    if (!item.isFolder) {
+                        const img = document.createElement('img');
+
+                        // ✅ Encode the image path to handle spaces
+                        const encodedPath = encodeURI(`http://localhost:3000/library/${folderPath}/${item.name}`);
+
+                        img.src = encodedPath;  // Use encoded path
+                        img.classList.add('photo');
+                        img.onclick = () => openFullscreen(img);
+                        photosDiv.appendChild(img);
+                    }
+                });
+
+                photosDiv.classList.add('open');
+                btn.textContent = 'Close';
+            } catch (error) {
+                console.error('Failed to load folder content:', error);
+            }
+        }
+    }
+
+    // ✅ Open image in fullscreen
+    function openFullscreen(img) {
+        const fullscreen = document.createElement('div');
+        fullscreen.classList.add('fullscreen');
+        fullscreen.innerHTML = `
+            <img src="${img.src}" alt="Full Image">
+            <span class="close-btn" onclick="this.parentElement.remove()">&times;</span>
+        `;
+        document.body.appendChild(fullscreen);
+    }
+
+    window.onload = loadLibrary;
+</script>
+
+
+
+</body>
+</html>
